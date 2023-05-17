@@ -31,6 +31,7 @@ const SideMenu = () => {
       <List
         itemLayout="horizontal"
         dataSource={menuItems}
+        style={{ background: 'white' }}
         renderItem={(item) => (
           <List.Item
             style={{
