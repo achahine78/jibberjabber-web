@@ -1,25 +1,46 @@
-import { Input, Button, Form, Card } from "antd";
+import { Input, Button, Form, Card, message } from "antd";
+import { addBearerToken, privateAxios } from "../../api";
+import { useNavigate } from "react-router-dom";
 
-const onFinish = (values: any) => {
-  console.log("Success:", values);
-};
-
-const onFinishFailed = (errorInfo: any) => {
-  console.log("Failed:", errorInfo);
+type LoginFormValues = {
+  username: string;
+  password: string;
 };
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const onFinish = (values: LoginFormValues) => {
+    const { username, password } = values;
+
+    privateAxios
+      .post("/login", {
+        username,
+        password,
+      })
+      .then(({ data }) => {
+        if (data?.token) {
+          localStorage.setItem("token", data?.token);
+          addBearerToken(data?.token);
+          navigate("/home");
+        }
+      })
+      .catch(({ response }) => {
+        const { data } = response;
+        if (data.message) {
+          message.error(data.message);
+        } else {
+          message.error("Something went wrong. Please try again later.");
+        }
+      });
+  };
+
   return (
-    <Card
-      title="Login"
-      style={{ width: 300 }}
-    >
+    <Card title="Login" style={{ width: 300 }}>
       <Form
         name="basic"
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
         <Form.Item
@@ -29,7 +50,6 @@ const LoginPage = () => {
         >
           <Input />
         </Form.Item>
-
         <Form.Item
           label="Password"
           name="password"
