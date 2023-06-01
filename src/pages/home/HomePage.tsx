@@ -1,30 +1,7 @@
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { Card, Col, Row } from "antd";
-import { useState } from "react";
-
-const dummyPosts = [
-  {
-    id: "0",
-    content: "what's the deal with airplane peanuts?",
-    createdAt: String(Date.now()),
-    upvotes: 20,
-    downvotes: 3,
-  },
-  {
-    id: "1",
-    content: "what's the deal with all these airplane peanuts?",
-    createdAt: String(Date.now()),
-    upvotes: 26,
-    downvotes: 3,
-  },
-  {
-    id: "2",
-    content: "how you like them apples",
-    createdAt: String(Date.now()),
-    upvotes: 0,
-    downvotes: 12,
-  },
-];
+import { useEffect, useState } from "react";
+import { privateAxios } from "../../api";
 
 type Post = {
   id: string;
@@ -67,7 +44,14 @@ const PostFeed = ({ posts }: PostFeedProps) => (
 );
 
 const HomePage = () => {
-  const [posts, setPosts] = useState<Post[]>(dummyPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  useEffect(() => {
+    privateAxios.get('/api/post').then(({ data }) => {
+      if (data.posts) {
+        setPosts(data.posts);
+      }
+    })
+  }, []);
   return (
     <div>
       <PostFeed posts={posts} />
